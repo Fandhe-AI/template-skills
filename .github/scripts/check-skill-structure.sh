@@ -7,6 +7,7 @@
 # 検証内容:
 #   1. 各 skills/<name>/SKILL.md が frontmatter (--- 始まり) を持つ
 #   2. frontmatter に name / description / user-invocable キーがある
+#      (user-invocable の値は true / false のみ許容)
 #   3. name の値がディレクトリ名と一致する
 #   4. .claude/skills/<name> 配下の symlink がリンク切れでない (実ディレクトリは対象外)
 #   5. skills-lock.json が存在し妥当な JSON である
@@ -57,6 +58,32 @@ for skill_md in skills/*/SKILL.md; do
       err "${skill_md}: frontmatter に '${key}:' が無い"
     fi
   done
+
+  # user-invocable はキーの存在だけでなく値も検証する。キー存在のみの検証では
+  # 空値や `yes` / `on` 等の YAML 真偽値もどきが素通りし、消費側 (スキル読み込み) の
+  # 挙動が不定になるため、値を true / false の 2 値に限定する
+  # (キー不在は上のループでエラー済みのため、ここではキーがある場合のみ判定する)。
+  # YAML は値の後ろに「空白 + #」のインラインコメントを許容する
+  # (例: `user-invocable: true # CLI から利用可`) ため、クォートで始まらない値に限り
+  # 空白 + '#' 以降を除去してから前後空白を trim して判定する (クォートで始まる値は
+  # true / false と一致せずどのみち不正判定になるため、コメント除去の対象外でよい)。
+  if printf '%s\n' "${fm}" | grep -qE '^user-invocable:'; then
+    # 値の検証は `head -n 1` で最初の 1 件しか見ないため、キーが重複していると
+    # 2 個目以降の不正値 (例: 1 個目 true・2 個目 yes) が素通りし、重複キーを後勝ちで
+    # 解釈する消費側では不正値が有効になる。先に出現回数を数え、1 件超はエラーにする
+    # (キー存在は確認済みのため、ここの grep -c は必ず 1 以上を返す)。
+    ui_count="$(printf '%s\n' "${fm}" | grep -cE '^user-invocable:')"
+    if [ "${ui_count}" -gt 1 ]; then
+      err "${skill_md}: user-invocable キーが重複 (${ui_count} 件。1 件のみ許容)"
+    else
+      ui_value="$(printf '%s\n' "${fm}" \
+        | grep -E '^user-invocable:' | head -n 1 \
+        | sed -E 's/^user-invocable:[[:space:]]*//; /^["'"'"']/! s/[[:space:]]+#.*$//; s/[[:space:]]*$//' || true)"
+      if [ "${ui_value}" != "true" ] && [ "${ui_value}" != "false" ]; then
+        err "${skill_md}: user-invocable の値 '${ui_value}' が不正 (true / false のみ許容)"
+      fi
+    fi
+  fi
 
   # name の値がディレクトリ名と一致するか検証。
   # name: が無い場合 grep が非ゼロ終了するが、pipefail + set -e で全体を中断させず
