@@ -27,7 +27,7 @@ gh repo create <org>/<name> --template Fandhe-AI/template-skills --private
    Overview / Current Skills の差替枠（`<このリポの概要を書く>` 等）を実内容へ更新する
 3. **AGENTS.md の固有観点を書く** — 「リポジトリ固有の観点」章の差替枠を埋める
 4. **setup-repo-guards を適用する** — 組織標準の CI ガード一式
-   （codex-review / 必須チェック集約ジョブ / branch protection ruleset）を導入する
+   （ai-review / 必須チェック集約ジョブ / branch protection ruleset）を導入する
 
 ## スキル一覧
 
