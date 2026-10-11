@@ -47,6 +47,7 @@ skills/                               -- スキル本体（各ディレクトリ
     verification.md                   -- 完了ゲート規約（証拠なき完了宣言の禁止・5段階検証）
     debugging.md                      -- 根本原因デバッグ規約（修正前の原因調査・3回失敗でエスカレーション）
     code-comment-style.md             -- コード内コメント・ドキュメンテーションコメント規約
+    github-actions.md                 -- .github/workflows/ 編集規約（GitHub Actions のキャッシュ方針）
   skills/
     sample-skill                      -- ../../skills/sample-skill への symlink
   settings.json                       -- hooks 設定（SessionStart リマインダー）
@@ -126,6 +127,7 @@ main の役割は **対話・計画・委譲・報告** に徹する。token を
 | `verification.md` | 副作用を伴う全スキル・Agent | 完了ゲート（証拠なき完了宣言の禁止・5段階検証） |
 | `debugging.md` | 実装系スキル / sub-investigator | 根本原因デバッグ（修正前の原因調査・3回失敗でエスカレーション） |
 | `code-comment-style.md` | 実装系スキル / 全 author Agent | コード内コメント・ドキュメンテーションコメント規約（役割・境界・文脈） |
+| `github-actions.md` | `.github/workflows/` 編集時 | GitHub Actions のキャッシュ方針（容量 10 GB・効果の計測・保存は main の push のみ・キー設計） |
 
 ## Current Skills (1)
 
